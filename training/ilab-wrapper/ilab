@@ -102,8 +102,16 @@ get_model() {
 	fi
 }
 
+if [[ "${PODMAN_BACKGROUND_MODE}" == "true" ]]; then
+	echo "Running in background mode"
+	PODMAN_BACKGROUND_MODE_FLAGS="--detach"
+else
+	echo "Running in foreground mode"
+	PODMAN_BACKGROUND_MODE_FLAGS="--interactive"
+fi
+
 mkdir -p "${HOST_CACHE}"
-PODMAN_COMMAND=("podman" "run" "--rm" "-it" "--device" "${CONTAINER_DEVICE}" \
+PODMAN_COMMAND=("podman" "run" "--rm" "-t" "${PODMAN_BACKGROUND_MODE_FLAGS}" "--device" "${CONTAINER_DEVICE}" \
 		"--security-opt" "label=disable" "--net" "host" \
 		"-v" "${WORKDIR}:/instructlab" "--entrypoint" "" \
 		"-e" "HF_HOME=${CONTAINER_CACHE}" \
